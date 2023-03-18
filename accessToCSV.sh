@@ -68,7 +68,7 @@ fi
 
 # Check if required commands are installed
 missing_commands=()
-for cmd in mdb-tables mdb-export zenity; do
+for cmd in awk sed zenity; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     missing_commands+=("$cmd")
   fi
