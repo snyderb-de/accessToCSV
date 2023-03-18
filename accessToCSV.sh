@@ -72,14 +72,15 @@ if ! is_mdbtools_installed; then
   fi
 fi
 
-folder=$(python3 -c 'import tkinter as tk; from tkinter import filedialog; root = tk.Tk(); root.withdraw(); folder = filedialog.askdirectory(title="Select Folder with Access Database Files"); print(folder)' 2>/dev/null)
-if [ -z "$folder" ]; then
-  echo "User cancelled. Exiting."
-  exit 1
+if [[ "$(uname)" == "Darwin" ]]; then
+  folder=$(osascript -e 'try' -e 'set _folder to choose folder with prompt "Select Folder with Access Database Files"' -e 'POSIX path of _folder' -e 'on error' -e '' -e 'end try')
+  output=$(osascript -e 'try' -e 'set _folder to choose folder with prompt "Select Output Folder"' -e 'POSIX path of _folder' -e 'on error' -e '' -e 'end try')
+else
+  folder=$(python3 -c 'import tkinter as tk; from tkinter import filedialog; root = tk.Tk(); root.withdraw(); folder = filedialog.askdirectory(title="Select Folder with Access Database Files"); print(folder)' 2>/dev/null)
+  output=$(python3 -c 'import tkinter as tk; from tkinter import filedialog; root = tk.Tk(); root.withdraw(); folder = filedialog.askdirectory(title="Select Output Folder"); print(folder)' 2>/dev/null)
 fi
 
-output=$(python3 -c 'import tkinter as tk; from tkinter import filedialog; root = tk.Tk(); root.withdraw(); folder = filedialog.askdirectory(title="Select Output Folder"); print(folder)' 2>/dev/null)
-if [ -z "$output" ]; then
+if [ -z "$folder" ] || [ -z "$output" ]; then
   echo "User cancelled. Exiting."
   exit 1
 fi
