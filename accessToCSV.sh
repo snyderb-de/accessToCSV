@@ -42,9 +42,10 @@ function is_mdbtools_installed() {
 
 function export_tables_to_csv() {
   local folder="$1"
+  log_file="$output/accessToCSV_error_log.txt"
   for fullfilename in "$folder"/*.{accdb,mdb}; do
     if [ ! -f "$fullfilename" ] || ! mdb-tables -1 "$fullfilename" >/dev/null 2>&1; then
-      echo "Skipping invalid file: $fullfilename"
+      echo "Skipping invalid file: $fullfilename" >> "$log_file"
       continue
     fi
 
@@ -55,7 +56,7 @@ function export_tables_to_csv() {
 
     IFS=$'\n'
     for table in $(mdb-tables -1 "$fullfilename"); do
-      echo "Exporting table $table from $filename"
+      echo "Exporting table $table from $filename" >> "$log_file"
       mdb-export "$fullfilename" "$table" > "$output_dir/$table.csv"
     done
   done
