@@ -50,11 +50,12 @@ function export_tables_to_csv() {
   for fullfilename in "$folder"/*; do
     extension="${fullfilename##*.}"
     if [[ "$extension" != "accdb" && "$extension" != "mdb" ]]; then
+      echo "Skippednon-Access file: $fullfilename" >> "$log_file"
       continue
     fi
 
     if [ ! -f "$fullfilename" ] || ! mdb-tables -1 "$fullfilename" >/dev/null 2>&1; then
-      echo "Skipping invalid file: $fullfilename" >> "$log_file"
+      echo "Skipped invalid file: $fullfilename" >> "$log_file"
       continue
     fi
 
@@ -70,8 +71,6 @@ function export_tables_to_csv() {
     done
   done
 }
-
-
 
 if ! is_mdbtools_installed; then
   echo "The mdbtools package is required but is not installed."
