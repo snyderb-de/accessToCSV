@@ -56,7 +56,7 @@ function export_tables_to_csv() {
 
     IFS=$'\n'
     for table in $(mdb-tables -1 "$fullfilename"); do
-      echo "Exporting table $table from $filename" >> "$log_file"
+      echo "Exporting table $table from $filename"
       mdb-export "$fullfilename" "$table" > "$output_dir/$table.csv"
     done
   done
