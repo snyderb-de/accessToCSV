@@ -42,7 +42,7 @@ function is_mdbtools_installed() {
 
 function export_tables_to_csv() {
   local folder="$1"
-  log_file="$output/accessToCSV_error_log.txt"
+  log_file="$output/error_log.txt"
   for fullfilename in "$folder"/*.{accdb,mdb}; do
     if [ ! -f "$fullfilename" ] || ! mdb-tables -1 "$fullfilename" >/dev/null 2>&1; then
       echo "Skipping invalid file: $fullfilename" >> "$log_file"
@@ -61,6 +61,7 @@ function export_tables_to_csv() {
     done
   done
 }
+
 
 if ! is_mdbtools_installed; then
   echo "The mdbtools package is required but is not installed."
