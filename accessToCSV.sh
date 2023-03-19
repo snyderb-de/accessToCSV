@@ -43,6 +43,10 @@ function is_mdbtools_installed() {
 function export_tables_to_csv() {
   local folder="$1"
   log_file="$output/error_log.txt"
+
+  # Ensure the log file is created
+  touch "$log_file"
+
   for fullfilename in "$folder"/*; do
     extension="${fullfilename##*.}"
     if [[ "$extension" != "accdb" && "$extension" != "mdb" ]]; then
