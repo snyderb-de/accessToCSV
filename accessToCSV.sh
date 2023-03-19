@@ -49,7 +49,7 @@ function export_tables_to_csv() {
 
   for fullfilename in "$folder"/*; do
     extension="${fullfilename##*.}"
-    if [[ "$extension" != "accdb" && "$extension" != "mdb" ]]; then
+    if [[ "$extension" != "accdb" && "$extension" != "mdb" && "$extension" != "adp" ]]; then
       echo "Skippednon-Access file: $fullfilename" >> "$log_file"
       continue
     fi
