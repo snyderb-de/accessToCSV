@@ -1,5 +1,28 @@
 #!/usr/bin/env bash
 
+function check_python_and_tkinter() {
+
+  echo "Checking for Python 3 and Tkinter..."
+
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "Python 3 is required but not installed on your system."
+    echo "Please visit https://www.python.org/downloads/ to download and install Python 3."
+    exit 1
+  fi
+
+  if ! python3 -c "import tkinter" >/dev/null 2>&1; then
+    echo "Tkinter is required but not installed on your system."
+    echo "Please install Tkinter for Python 3. You can learn more at https://tkdocs.com/tutorial/install.html"
+    exit 1
+  fi
+
+  echo "Python 3 and Tkinter are installed. Proceeding with the script..."
+  sleep 3
+
+}
+
+check_python_and_tkinter
+
 function install_dependencies() {
   if command -v apt-get >/dev/null 2>&1; then
     PKG_MANAGER="apt-get"
@@ -37,11 +60,14 @@ function install_dependencies() {
 }
 
 function is_mdbtools_installed() {
+  echo "Checking for mdbtols..."
   command -v mdb-export >/dev/null 2>&1
 }
 
 function export_tables_to_csv() {
   local folder="$1"
+  local total_files="$2"
+  local processed_files=0
   log_file="$output/error_log.txt"
 
   # Ensure the log file is created
@@ -50,7 +76,7 @@ function export_tables_to_csv() {
   for fullfilename in "$folder"/*; do
     extension="${fullfilename##*.}"
     if [[ "$extension" != "accdb" && "$extension" != "mdb" && "$extension" != "adp" ]]; then
-      echo "Skippednon-Access file: $fullfilename" >> "$log_file"
+      echo "Skipped non-Access file: $fullfilename" >> "$log_file"
       continue
     fi
 
@@ -69,7 +95,11 @@ function export_tables_to_csv() {
       echo "Exporting table $table from $filename"
       mdb-export "$fullfilename" "$table" > "$output_dir/$table.csv"
     done
+    # Increment the processed files count and print the progress
+    ((processed_files++))
+    echo -ne "Processing files: $processed_files/$total_files\r"
   done
+  echo
 }
 
 if ! is_mdbtools_installed; then
@@ -78,7 +108,7 @@ if ! is_mdbtools_installed; then
   if [[ "$answer" =~ [yY](es)* ]]; then
     install_dependencies
   else
-    echo "Aborting."
+    echo "No? ... alright, then."
     exit 1
   fi
 fi
@@ -96,4 +126,7 @@ if [ -z "$folder" ] || [ -z "$output" ]; then
   exit 1
 fi
 
-export_tables_to_csv "$folder"
+
+total_files=$(find "$folder" -type f \( -iname "*.accdb" -o -iname "*.mdb" -o -iname "*.adp" \) | wc -l)
+
+export_tables_to_csv "$folder" "$total_files"
