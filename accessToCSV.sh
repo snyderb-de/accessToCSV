@@ -93,7 +93,11 @@ function export_tables_to_csv() {
     IFS=$'\n'
     for table in $(mdb-tables -1 "$fullfilename"); do
       echo "Exporting table $table from $filename"
-      mdb-export "$fullfilename" "$table" > "$output_dir/$table.csv"
+      csv_output="$output_dir/$table.csv"
+      xlsx_output="$output_dir/$table.xlsx"
+      mdb-export "$fullfilename" "$table" > "$csv_output"
+      # Convert CSV to Excel with pandas
+      python3 -c "import pandas as pd; df = pd.read_csv('$csv_output'); df.to_excel('$xlsx_output', index=False)"
     done
     # Increment the processed files count and print the progress
     ((processed_files++))
@@ -101,6 +105,7 @@ function export_tables_to_csv() {
   done
   echo
 }
+
 
 if ! is_mdbtools_installed; then
   echo "The mdbtools package is required but is not installed."
